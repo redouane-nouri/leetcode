@@ -2,19 +2,16 @@
 class Solution {
 public:
   std::vector<std::vector<int>> generate(int numRows) {
-    std::vector<std::vector<int>> result = {{1}};
+    std::vector<std::vector<int>> res(numRows);
 
-    for (std::size_t i = 1; i < numRows; ++i) {
-      std::vector<int> current_line(i + 1);
-      current_line[0] = current_line[i] = 1;
+    for (int i = 0; i < numRows; ++i) {
+      res[i].resize(i + 1);
+      res[i][0] = res[i][i] = 1;
 
-      for (std::size_t j = 1; j < i; ++j) {
-        current_line[j] = result[i - 1][j - 1] + result[i - 1][j];
-      }
-
-      result.push_back(current_line);
+      for (int j = 1; j < i; ++j)
+        res[i][j] = res[i - 1][j - 1] + res[i - 1][j];
     }
 
-    return result;
+    return res;
   }
 };
