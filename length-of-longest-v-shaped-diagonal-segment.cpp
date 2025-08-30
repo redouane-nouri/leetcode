@@ -1,57 +1,101 @@
+#include <algorithm>
 #include <vector>
 
 class Solution {
-  const int NO_TURN = 0, TURNED = 1, DOWN_RIGHT = 0, DOWN_LEFT = 1, UP_LEFT = 2,
-            UP_RIGHT = 3, STEP_DOWN = +1, STEP_UP = -1, STEP_RIGHT = +1,
-            STEP_LEFT = -1, SEQ[3] = {2, 2, 0},
-            DX[4] = {STEP_DOWN, STEP_DOWN, STEP_UP, STEP_UP},
-            DY[4] = {STEP_RIGHT, STEP_LEFT, STEP_LEFT, STEP_RIGHT},
-            CLOCKWISE[4] = {DOWN_LEFT, UP_LEFT, UP_RIGHT, DOWN_RIGHT};
+  int di[4] = {1, -1, 1, -1}, dj[4] = {1, -1, -1, 1}, n, m, c[4] = {2, 3, 1, 0};
+  std::vector<std::vector<int>> *g;
 
-  int m, n;
-  std::vector<std::vector<std::vector<std::vector<int>>>> dp;
+  int explore(int i, int j, int d, int t) {
+    int ni = i + di[d], nj = j + dj[d], tr = ((*g)[i][j] == 2 ? 0 : 2);
 
-  int exploreDP(const std::vector<std::vector<int>> &grid, int i, int j,
-                int dir, int turnState) {
-    if (dp[i][j][dir][turnState] != -1)
-      return dp[i][j][dir][turnState];
+    if (ni < 0 || nj < 0 || ni >= n || nj >= m || (*g)[ni][nj] != tr)
+      return 0;
 
-    int len = 1, nextVal = SEQ[grid[i][j]], ni = i + DX[dir], nj = j + DY[dir];
+    int l = explore(ni, nj, d, t);
 
-    if (ni >= 0 && ni < m && nj >= 0 && nj < n && grid[ni][nj] == nextVal)
-      len = 1 + exploreDP(grid, ni, nj, dir, turnState);
+    if (!t)
+      l = std::max(explore(ni, nj, c[d], 1), l);
 
-    if (turnState == NO_TURN) {
-      int newDir = CLOCKWISE[dir], ti = i + DX[newDir], tj = j + DY[newDir];
-      if (ti >= 0 && ti < m && tj >= 0 && tj < n && grid[ti][tj] == nextVal) {
-        int tempLen = 1 + exploreDP(grid, ti, tj, newDir, TURNED);
-        if (tempLen > len)
-          len = tempLen;
-      }
-    }
-
-    return dp[i][j][dir][turnState] = len;
+    return l + 1;
   }
 
 public:
   int lenOfVDiagonal(std::vector<std::vector<int>> &grid) {
-    m = grid.size();
-    n = grid[0].size();
+    g = &grid;
+    n = grid.size(), m = grid[0].size();
+    int res = 0;
 
-    dp.assign(
-        m, std::vector<std::vector<std::vector<int>>>(
-               n, std::vector<std::vector<int>>(4, std::vector<int>(2, -1))));
+    for (int i = 0; i < n; ++i) {
+      for (int j = 0; j < m; ++j) {
+        if (grid[i][j] == 1) {
+          int l[4] = {n - i, i + 1, j + 1, m - j};
 
-    int maxLen = 0;
-    for (int i = 0; i < m; ++i)
-      for (int j = 0; j < n; ++j)
-        if (grid[i][j] == 1)
-          for (int d = 0; d < 4; ++d) {
-            int tempLen = exploreDP(grid, i, j, d, NO_TURN);
-            if (tempLen > maxLen)
-              maxLen = tempLen;
-          }
+          for (int d = 0; d < 4; ++d)
+            if (l[d] > res)
+              res = std::max(res, explore(i, j, d, 0) + 1);
+        }
+      }
+    }
 
-    return maxLen;
+    return res;
   }
 };
+
+/*
+//dp version
+#include <algorithm>
+#include <vector>
+
+class Solution {
+  int di[4] = {1, -1, 1, -1}, dj[4] = {1, -1, -1, 1}, n, m, c[4] = {2, 3, 1, 0};
+  std::vector<std::vector<int>> *g;
+  int *dp;
+
+  int explore(int i, int j, int d, int t) {
+    int ni = i + di[d], nj = j + dj[d], tr = ((*g)[i][j] == 2 ? 0 : 2);
+
+    if (ni < 0 || nj < 0 || ni >= n || nj >= m || (*g)[ni][nj] != tr)
+      return 0;
+
+    int &l = dp[((i * m + j) * 4 + d) * 2 + t];
+
+    if (l == -1) {
+      l = explore(ni, nj, d, t);
+
+      if (!t)
+        l = std::max(explore(ni, nj, c[d], 1), l);
+
+      ++l;
+    }
+
+    return l;
+  }
+
+public:
+  int lenOfVDiagonal(std::vector<std::vector<int>> &grid) {
+    g = &grid;
+    n = grid.size(), m = grid[0].size();
+    int res = 0;
+
+    dp = new int[m * n * 4 * 2];
+    std::fill(dp, dp + n * m * 4 * 2, -1);
+
+    for (int i = 0; i < n; ++i) {
+      for (int j = 0; j < m; ++j) {
+        if (grid[i][j] == 1) {
+          int l[4] = {n - i, i + 1, j + 1, m - j};
+
+          for (int d = 0; d < 4; ++d)
+            if (l[d] > res)
+              res = std::max(res, explore(i, j, d, 0) + 1);
+        }
+      }
+    }
+
+    delete[] dp;
+
+    return res;
+  }
+};
+
+ */
