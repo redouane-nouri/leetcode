@@ -1,37 +1,54 @@
 #include <vector>
 
 class Solution {
-public:
-  void solveSudoku(std::vector<std::vector<char>> &board) { answer(board); }
+  int r[9] = {0}, c[9] = {0}, b[9] = {0};
+  std::vector<int> e;
+  std::vector<std::vector<char>> *bo;
 
-private:
-  bool answer(std::vector<std::vector<char>> &b) {
+  bool solve(int ix) {
+    if (ix == e.size())
+      return true;
+
+    int i = e[ix], j = e[ix + 1], bi = (i / 3) * 3 + (j / 3);
+
+    for (int d = 0; d < 9; ++d) {
+      if (!((r[i] | c[j] | b[bi]) & (1 << d))) {
+        (*bo)[i][j] = d + '1';
+        r[i] |= 1 << d;
+        c[j] |= 1 << d;
+        b[bi] |= 1 << d;
+
+        if (solve(ix + 2))
+          return true;
+
+        (*bo)[i][j] = '.';
+        r[i] ^= 1 << d;
+        c[j] ^= 1 << d;
+        b[bi] ^= 1 << d;
+      }
+    }
+
+    return false;
+  }
+
+public:
+  void solveSudoku(std::vector<std::vector<char>> &board) {
+    bo = &board;
+
     for (int i = 0; i < 9; ++i) {
       for (int j = 0; j < 9; ++j) {
-        if (b[i][j] == '.') {
-          for (char c = '1'; c <= '9'; ++c) {
-            if (satisfied(b, i, j, c)) {
-              b[i][j] = c;
-              if (answer(b))
-                return true;
-
-              b[i][j] = '.';
-            }
-          }
-
-          return false;
+        if (board[i][j] != '.') {
+          int d = board[i][j] - '1';
+          r[i] |= 1 << d;
+          c[j] |= 1 << d;
+          b[(i / 3) * 3 + (j / 3)] |= 1 << d;
+        } else {
+          e.push_back(i);
+          e.push_back(j);
         }
       }
     }
 
-    return true;
-  }
-  bool satisfied(std::vector<std::vector<char>> &b, int i, int j, char c) {
-    for (int k = 0; k < 9; ++k)
-      if (b[i][k] == c || b[k][j] == c ||
-          b[3 * (i / 3) + k / 3][3 * (j / 3) + k % 3] == c)
-        return false;
-
-    return true;
+    solve(0);
   }
 };
