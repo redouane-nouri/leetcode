@@ -1,15 +1,17 @@
 #include <vector>
+
 class Solution {
 public:
   std::vector<int> plusOne(std::vector<int> &digits) {
-    for (std::vector<int>::reverse_iterator it = digits.rbegin();
-         it != digits.rend(); it++) {
-      if (*it < 9) {
-        *it = *it + 1;
+    const int n = digits.size();
+
+    for (int i = n - 1; i >= 0; i--) {
+      if (digits[i] < 9) {
+        digits[i]++;
         return digits;
       }
 
-      *it = 0;
+      digits[i] = 0;
     }
 
     digits.insert(digits.begin(), 1);
