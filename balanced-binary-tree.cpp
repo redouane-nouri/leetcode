@@ -1,4 +1,6 @@
-#include <algorithm>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 struct TreeNode {
   int val;
@@ -11,29 +13,24 @@ struct TreeNode {
 };
 
 class Solution {
-public:
-  bool isBalanced(TreeNode *root) { return isBalancedHelper(root) != -1; }
-
-private:
-  int isBalancedHelper(TreeNode *root) {
-    if (!root) {
+  int height(TreeNode *root) {
+    if (!root)
       return 0;
-    }
 
-    int leftDepth = isBalancedHelper(root->left);
-    if (leftDepth == -1) {
+    int r = height(root->right);
+    if (r == -1)
       return -1;
-    }
 
-    int rightDepth = isBalancedHelper(root->right);
-    if (rightDepth == -1) {
+    int l = height(root->left);
+    if (l == -1)
       return -1;
-    }
 
-    if (std::abs(leftDepth - rightDepth) > 1) {
+    if (abs(r - l) > 1)
       return -1;
-    }
 
-    return std::max(leftDepth, rightDepth) + 1;
+    return max(r, l) + 1;
   }
+
+public:
+  bool isBalanced(TreeNode *root) { return height(root) != -1; }
 };
