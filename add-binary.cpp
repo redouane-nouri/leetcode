@@ -1,36 +1,28 @@
-#include <algorithm>
-#include <string>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 class Solution {
 public:
-  std::string addBinary(std::string a, std::string b) {
-    std::string::reverse_iterator a_it = a.rbegin(), b_it = b.rbegin(),
-                                  a_end = a.rend(), b_end = b.rend();
-    std::string result = "";
-    unsigned int carry = 0, sum = 0;
+  string addBinary(string a, string b) {
+    int i = a.size() - 1;
+    int j = b.size() - 1;
+    int carry = 0;
+    string ans;
 
-    while (a_it != a_end || b_it != b_end) {
-      sum = carry;
+    while (i >= 0 || j >= 0 || carry) {
+      if (i >= 0)
+        carry += a[i--] - '0';
 
-      if (a_it != a_end) {
-        sum += *a_it - '0';
-        ++a_it;
-      }
+      if (j >= 0)
+        carry += b[j--] - '0';
 
-      if (b_it != b_end) {
-        sum += *b_it - '0';
-        ++b_it;
-      }
-
-      carry = sum / 2;
-      result.push_back((sum % 2) + '0');
+      ans += carry % 2 + '0';
+      carry /= 2;
     }
 
-    if (carry) {
-      result.push_back('1');
-    }
+    reverse(ans.begin(), ans.end());
 
-    std::reverse(result.begin(), result.end());
-    return result;
+    return ans;
   }
 };
