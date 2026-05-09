@@ -9,31 +9,27 @@ struct ListNode {
 class Solution {
 public:
   ListNode *rotateRight(ListNode *head, int k) {
-    if (!head || !head->next)
+    if (!head || !head->next || k == 0)
       return head;
 
-    int listLength = 1, tailPosition;
-    ListNode *tmp = head, *newHead, *lastNode;
+    ListNode *tail = head;
+    int n = 1;
 
-    while (tmp->next) {
-      ++listLength;
-      tmp = tmp->next;
-    }
+    while (tail->next)
+      tail = tail->next, n++;
 
-    tailPosition = listLength - (k % listLength);
-
-    if (tailPosition == listLength)
+    k = k % n;
+    if (k == 0)
       return head;
 
-    lastNode = tmp;
-    tmp = head;
+    tail->next = head;
 
-    for (int i = 1; i < tailPosition; ++i)
-      tmp = tmp->next;
+    ListNode *newTail = head;
+    for (int i = 1; i < n - k; i++)
+      newTail = newTail->next;
 
-    newHead = tmp->next;
-    tmp->next = nullptr;
-    lastNode->next = head;
+    ListNode *newHead = newTail->next;
+    newTail->next = nullptr;
 
     return newHead;
   }
