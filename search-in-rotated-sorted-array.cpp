@@ -1,29 +1,32 @@
-#include <cstdint>
-#include <vector>
+/**
+ * @author Redouane Nouri
+ */
+
+#include <bits/stdc++.h>
+
+using namespace std;
 
 class Solution {
 public:
-  int search(std::vector<int> &nums, int target) {
-    std::size_t l = 0, r = nums.size() - 1, m;
+  int search(vector<int> &nums, int target) {
+    int l = 0, r = nums.size() - 1;
 
-    while (l <= r && r != SIZE_MAX) {
-      m = l + (r - l) / 2;
+    while (l <= r) {
+      int m = l + (r - l >> 1);
 
       if (nums[m] == target)
         return m;
 
       if (nums[l] <= nums[m]) {
-        if (nums[l] <= target && target < nums[m]) {
+        if (nums[l] <= target && target < nums[m])
           r = m - 1;
-        } else {
+        else
           l = m + 1;
-        }
       } else {
-        if (nums[m] < target && target <= nums[r]) {
+        if (nums[m] < target && target <= nums[r])
           l = m + 1;
-        } else {
+        else
           r = m - 1;
-        }
       }
     }
 
