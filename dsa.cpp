@@ -7,7 +7,9 @@
 using namespace std;
 using ll = long long;
 
-int eucMod(int a, int b) { return (a % b + abs(b)) % abs(b); };
+int eucMod(const int &a, const int &mod) {
+  return (a % mod + abs(mod)) % abs(mod);
+};
 
 ll encode(int a, int b) { return (ll)a << 32 | (unsigned int)b; }
 
@@ -40,7 +42,7 @@ ll inv(ll v, ll m) { return expo(v, m - 2, m); }
 struct DSU {
   vector<int> parent, size;
 
-  DSU(const int n) : parent(n), size(n, 1) {
+  DSU(const int N) : parent(N), size(N, 1) {
     iota(parent.begin(), parent.end(), 0);
   }
 
@@ -196,14 +198,14 @@ class SparseTable {
   int merge(const int a, const int b) const { return max(a, b); }
 
   void build(const vector<int> &data) {
-    const int n = data.size(), m = __lg(n) + 1;
-    table.assign(m, vector<int>(n));
+    const int N = data.size(), M = __lg(N) + 1;
+    table.assign(M, vector<int>(N));
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < N; i++)
       table[0][i] = data[i];
 
-    for (int i = 1; i < m; i++)
-      for (int j = 0; j + (1 << i) <= n; j++)
+    for (int i = 1; i < M; i++)
+      for (int j = 0; j + (1 << i) <= N; j++)
         table[i][j] = merge(table[i - 1][j], table[i - 1][j + (1 << (i - 1))]);
   }
 
@@ -214,6 +216,37 @@ public:
     const int k = __lg(r - l + 1);
 
     return merge(table[k][l], table[k][r - (1 << k) + 1]);
+  }
+};
+
+class BinaryLifting {
+  vector<vector<int>> up;
+
+  void build(const vector<int> &next) {
+    const int N = next.size(), M = __lg(N) + 1;
+
+    up.assign(M, vector<int>(N));
+    up[0] = next;
+
+    for (int i = 1; i < M; i++)
+      for (int j = 0; j < N; j++)
+        up[i][j] = up[i - 1][up[i - 1][j]];
+  }
+
+public:
+  BinaryLifting(const vector<int> &next) { build(next); }
+
+  int query(const int from, const int to) const {
+    if (from == to)
+      return 0;
+
+    int cur = from, jumps = 0;
+
+    for (int i = up.size() - 1; i >= 0; i--)
+      if (up[i][cur] < to)
+        jumps += 1 << i, cur = up[i][cur];
+
+    return (up[0][cur] >= to) ? jumps + 1 : -1;
   }
 };
 
@@ -276,3 +309,99 @@ public:
     return depth[u] + depth[v] - (depth[lca(u, v)] << 1);
   }
 };
+
+class KMP {
+  string pattern_;
+  vector<int> lps_;
+
+  vector<int> buildLPS(string &pattern) {
+    const int N = pattern.size();
+    int prefixLen = 0, i = 1;
+    vector<int> lps(N);
+    lps[0] = 0;
+
+    while (i < N)
+      if (pattern[i] == pattern[prefixLen])
+        ++prefixLen, lps[i] = prefixLen, ++i;
+      else
+        prefixLen ? (prefixLen = lps[prefixLen - 1]) : (lps[i] = 0, ++i);
+
+    return lps;
+  }
+
+public:
+  KMP(const string &pattern) : pattern_(pattern) { lps_ = buildLPS(pattern_); }
+
+  vector<int> search(const string &text) {
+    vector<int> matches;
+    const int N = text.size(), M = pattern_.size();
+
+    if (!M)
+      return matches;
+
+    int i = 0, j = 0;
+    while (i < N) {
+      if (text[i] == pattern_[j]) {
+        ++i, ++j;
+        if (j == M)
+          matches.push_back(i - j), j = lps_[j - 1];
+      } else {
+        j ? j = lps_[j - 1] : ++i;
+      }
+    }
+
+    return matches;
+  }
+};
+
+vector<int> dijkstra(const int N, vector<vector<pair<int, int>>> &graph,
+                     const int src) {
+  vector<int> dist(N, INT_MAX);
+  priority_queue<pair<int, int>, vector<pair<int, int>>,
+                 greater<pair<int, int>>>
+      pq;
+
+  dist[src] = 0;
+  pq.push({0, src});
+
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+
+    if (d != dist[u])
+      continue;
+
+    for (auto &[v, w] : graph[u])
+      if (dist[v] > d + w)
+        dist[v] = d + w, pq.push({dist[v], v});
+  }
+
+  return dist;
+}
+
+vector<int> zeroOneBFS(const int N, vector<vector<pair<int, int>>> &graph,
+                       const int src) {
+  vector<int> dist(N, INT_MAX);
+  deque<int> dq;
+
+  dist[src] = 0;
+  dq.push_front(src);
+
+  while (!dq.empty()) {
+    int u = dq.front();
+    dq.pop_front();
+
+    for (auto &[v, w] : graph[u]) {
+      if (dist[v] > dist[u] + w) {
+        dist[v] = dist[u] + w;
+
+        if (w == 0)
+          dq.push_front(v);
+        else
+          dq.push_back(v);
+      }
+    }
+  }
+
+  return dist;
+}
