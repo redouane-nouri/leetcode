@@ -183,7 +183,7 @@ class SegmentTree {
 
 public:
   SegmentTree(const vector<int> &data)
-      : n(data.size()), tree(1 << (__lg(n - 1) + 2)) {
+      : n(data.size()), tree(1 << (__lg(max(n - 1, 1)) + 2)) {
     build(1, 0, n - 1, data);
   }
 
