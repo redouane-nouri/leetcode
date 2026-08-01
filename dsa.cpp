@@ -405,3 +405,16 @@ vector<int> zeroOneBFS(const int N, vector<vector<pair<int, int>>> &graph,
 
   return dist;
 }
+
+long long combination(int n, int r) {
+  if (r > n || r < 0)
+    return 0;
+
+  r = min(r, n - r);
+
+  long long res = 1;
+  for (int i = 1; i <= r; i++)
+    res = res * (n - r + i) / i;
+
+  return res;
+}
