@@ -40,11 +40,22 @@ ll expo(ll b, ll e, const ll m) {
 ll inv(ll v, ll m) { return expo(v, m - 2, m); }
 
 struct DSU {
+  // uncomment to use values not indices
+  // unordered_map<int, int> parent, size;
   vector<int> parent, size;
 
   DSU(const int N) : parent(N), size(N, 1) {
     iota(parent.begin(), parent.end(), 0);
   }
+
+  /*
+   DSU(const vector<int> &nums) {
+    for (const int& num : nums) {
+      parent[num] = num;
+      size[num] = 1;
+    }
+  }
+  */
 
   int find(const int u) {
     if (parent[u] == u)
