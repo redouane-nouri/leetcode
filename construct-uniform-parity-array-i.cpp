@@ -1,0 +1,12 @@
+/**
+ * @author Redouane Nouri
+ */
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+class Solution {
+public:
+  bool uniformArray(vector<int> &nums1) { return true; }
+};
