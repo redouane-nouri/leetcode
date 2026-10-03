@@ -1,27 +1,35 @@
-#include <stack>
-#include <string>
+/**
+ * @author Redouane Nouri
+ */
+
+#include <bits/stdc++.h>
+
+using namespace std;
 
 class Solution {
 public:
-  int longestValidParentheses(std::string s) {
-    int sLength = s.length(), mx = 0;
-    std::stack<int> sk;
-    sk.push(-1);
+  int longestValidParentheses(string s) {
+    const int SZ = s.length();
+    int ans = 0;
+    stack<int> st;
+    st.push(-1);
 
-    for (int i = 0; i < sLength; ++i) {
-      if (s[i] == '(') {
-        sk.push(i);
-      } else {
-        sk.pop();
-        if (sk.empty()) {
-          sk.push(i);
-        } else {
-          if (mx < i - sk.top())
-            mx = i - sk.top();
-        }
+    for (int i = 0; i < SZ; ++i) {
+      switch (s[i]) {
+      case '(':
+        st.push(i);
+        break;
+
+      default:
+        st.pop();
+
+        if (st.empty())
+          st.push(i);
+        else
+          ans = max(ans, i - st.top());
       }
     }
 
-    return mx;
+    return ans;
   }
 };

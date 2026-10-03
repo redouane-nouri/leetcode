@@ -138,7 +138,7 @@ class SegmentTree {
   int n;
   vector<int> tree;
 
-  int merge(const int a, const int b) const {
+  int merge(const int &a, const int &b) const {
     return max(a, b); // change to min or sum if needed
   }
 
@@ -146,7 +146,7 @@ class SegmentTree {
     return INT_MIN; // INT_MAX for min, 0 for sum
   }
 
-  void build(const int node, const int l, const int r,
+  void build(const int &node, const int &l, const int &r,
              const vector<int> &data) {
     if (l == r) {
       tree[node] = data[l];
@@ -161,8 +161,8 @@ class SegmentTree {
     tree[node] = merge(tree[node << 1], tree[node << 1 | 1]);
   }
 
-  int query(const int node, const int l, const int r, const int ql,
-            const int qr) const {
+  int query(const int &node, const int &l, const int &r, const int &ql,
+            const int &qr) const {
     if (qr < l || r < ql)
       return identity();
 
@@ -175,8 +175,8 @@ class SegmentTree {
                  query(node << 1 | 1, mid + 1, r, ql, qr));
   }
 
-  void update(const int node, const int l, const int r, const int idx,
-              const int val) {
+  void update(const int &node, const int &l, const int &r, const int &idx,
+              const int &val) {
     if (l == r) {
       tree[node] = val;
       return;
@@ -198,9 +198,11 @@ public:
     build(1, 0, n - 1, data);
   }
 
-  int query(const int l, const int r) const { return query(1, 0, n - 1, l, r); }
+  int query(const int &l, const int &r) const {
+    return query(1, 0, n - 1, l, r);
+  }
 
-  void update(const int idx, const int val) { update(1, 0, n - 1, idx, val); }
+  void update(const int &idx, const int &val) { update(1, 0, n - 1, idx, val); }
 };
 
 class SparseTable {
